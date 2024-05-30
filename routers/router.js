@@ -14,7 +14,7 @@ usersRouter.route('/').get((req, res) => {
       await client.connect();
       console.log('Connected to the mongo DB');
       const db = client.db(DB_NAME);
-      const usersCollection =  db.collection('WorkExperiences')
+      const usersCollection = db.collection('Users');
       const users = await usersCollection.find().toArray();
       res.status(200).send(users);
     } catch (error) {
@@ -28,18 +28,17 @@ usersRouter.route('/').get((req, res) => {
   })();
 });
 
-// Uncomment and fix the sessionRouter code if needed
 usersRouter.route('/:id').get((req, res) => {
   const id = req.params.id;
   (async function mongo() {
     let client;
     try {
-      client = new MongoClient(MONGO_URL); // Remove deprecated options
+      client = new MongoClient(MONGO_URL);
       await client.connect();
       console.log('Connected to the mongo DB');
 
       const db = client.db(DB_NAME);
-      const workExperiences = await db.collection('WorkExperiences').findOne({ _id: new ObjectId(id) });
+      const workExperiences = await db.collection('Users').findOne({ _id: new ObjectId(id) });
       res.send(workExperiences);
     } catch (error) {
       console.error(error.stack);
