@@ -4,51 +4,53 @@ require('dotenv').config();
 
 const { MONGO_URL, DB_NAME } = process.env;
 
-const usersRouter = express.Router();
+let client;
+let db;
 
-usersRouter.route('/').get((req, res) => {
-  (async function mongo() {
-    let client;
+const connectToMongo = async () => {
+  if (!client) {
+    client = new MongoClient(MONGO_URL);
+    await client.connect();
+    db = client.db(DB_NAME);
+    console.log('Connected to the MongoDB');
+  }
+};
+
+const createRouter = (collectionName) => {
+  const router = express.Router();
+
+  router.route('/').get(async (req, res) => {
     try {
-      client = new MongoClient(MONGO_URL);
-      await client.connect();
-      console.log('Connected to the mongo DB');
-      const db = client.db(DB_NAME);
-      const usersCollection = db.collection('Users');
-      const users = await usersCollection.find().toArray();
-      res.status(200).send(users);
+      await connectToMongo();
+      const collection = db.collection(collectionName);
+      const data = await collection.find().toArray();
+      res.status(200).send(data);
     } catch (error) {
       console.error(error.stack);
-      res.status(500).send({ message: 'Internal Server Error' });
-    } finally {
-      if (client) {
-        await client.close();
-      }
+      res.status(500).send({ error, message: 'Internal Server Error' });
     }
-  })();
-});
+  });
 
-usersRouter.route('/:id').get((req, res) => {
-  const id = req.params.id;
-  (async function mongo() {
-    let client;
+  router.route('/:id').get(async (req, res) => {
+    const id = req.params.id;
     try {
-      client = new MongoClient(MONGO_URL);
-      await client.connect();
-      console.log('Connected to the mongo DB');
-
-      const db = client.db(DB_NAME);
-      const workExperiences = await db.collection('Users').findOne({ _id: new ObjectId(id) });
-      res.send(workExperiences);
+      await connectToMongo();
+      const collection = db.collection(collectionName);
+      const query = collectionName === 'Users' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
+      const data = await collection.findOne(query);
+      if (data) {
+        res.send(data);
+      }
+      else if (data === null || data.length === 0) {
+        res.status(404).send({ error: 404, message: 'No data found, check id' });
+      }
     } catch (error) {
       console.error(error.stack);
-      res.status(500).send({ message: 'Internal Server Error' });
-    } finally {
-      if (client) {
-        await client.close();
-      }
+      res.status(500).send({ error, message: 'Internal Server Error' });
     }
-  })();
-});
+  });
 
-module.exports = usersRouter;
+  return router;
+};
+
+module.exports = createRouter;
