@@ -1,11 +1,11 @@
 const express = require('express');
 require('dotenv').config();
-const createRouter = require('./routers/router');
 const helmet = require('helmet');
 const cors = require('cors');
+const createRouter = require('../routers/router');
 const compression = require('compression');
-const routes = require('./routers/routes');
-const apiKey = require('./midleware/apiKey');
+const routes = require('../routers/routes');
+const apiKey = require('../midleware/apiKey');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
