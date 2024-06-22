@@ -16,6 +16,7 @@ const seedUsers = async () => {
     console.log('Connected to the mongo DB');
     const db = client.db(DB_NAME);
     const usersCollection = db.collection('Users');
+    await usersCollection.drop();
     await usersCollection.insertMany(usersLocal);
   } catch (error) {
     console.error(error.stack);
@@ -26,8 +27,7 @@ const seedUsers = async () => {
   }
 };
 
-
-
+// seedUsers();
 
 const seedJobs = async () => {
   let client;
@@ -49,6 +49,7 @@ const seedJobs = async () => {
 
     });
 
+
     await jobsCollection.drop();
     await jobsCollection.insertMany(jobsWithUserId);
 
@@ -60,6 +61,8 @@ const seedJobs = async () => {
     }
   }
 };
+
+// seedJobs();
 
 
 const seedEducation = async () => {
@@ -94,6 +97,7 @@ const seedEducation = async () => {
   }
 };
 
+// seedEducation();
 
 
 const seedSkills = async () => {
@@ -128,6 +132,7 @@ const seedSkills = async () => {
   }
 };
 
+// seedSkills()
 
 
 

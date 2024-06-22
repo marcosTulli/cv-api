@@ -31,13 +31,30 @@ const createRouter = (collectionName) => {
     }
   });
 
-  router.route('/:id').get(async (req, res) => {
+  router.route('/:lang/:id').get(async (req, res) => {
     const id = req.params.id;
+    const lang = req.params.lang;
+
     try {
       await connectToMongo();
       const collection = db.collection(collectionName);
-      const query = collectionName === 'Users' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
-      const data = await collection.findOne(query);
+      const queryId = collectionName === 'Users' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
+      const projection = {
+        [`info.${lang}`]: 1, // Include the specific language info
+        name: 1,
+        email: 1,
+        phone: 1,
+        location: 1,
+        availableLanguages: 1,
+        cvs: 1,
+        network: 1
+      };
+
+      const data = await collection.findOne(queryId, { projection });
+      const hasLanguage = data.availableLanguages.includes(lang);
+      if (!hasLanguage) {
+        data.info = { [lang]: 'Language not available' };
+      }
       if (data) {
         res.send(data);
       }
