@@ -1,72 +1,35 @@
 const express = require('express');
-const { MongoClient, ObjectId } = require('mongodb');
 require('dotenv').config();
+const handler = require('./handlers');
+const routes = require('./routes');
 
-const { MONGO_URL, DB_NAME } = process.env;
-
-let client;
-let db;
-
-const connectToMongo = async () => {
-  if (!client) {
-    client = new MongoClient(MONGO_URL);
-    await client.connect();
-    db = client.db(DB_NAME);
-    console.log('Connected to the MongoDB');
-  }
-};
+const collections = routes.reduce((acc, curr) => ({
+  ...acc, [curr.collection]: curr.collection
+}), {});
 
 const createRouter = (collectionName) => {
   const router = express.Router();
 
   router.route('/').get(async (req, res) => {
-    try {
-      await connectToMongo();
-      const collection = db.collection(collectionName);
-      const data = await collection.find().toArray();
-      res.status(200).send(data);
-    } catch (error) {
-      console.error(error.stack);
-      res.status(500).send({ error, message: 'Internal Server Error' });
-    }
+    handler.base(req, res, collectionName);
   });
 
   router.route('/:lang/:id').get(async (req, res) => {
-    const id = req.params.id;
-    const lang = req.params.lang;
-
-    try {
-      await connectToMongo();
-      const collection = db.collection(collectionName);
-      const queryId = collectionName === 'Users' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
-      const projection = {
-        name: 1,
-        email: 1,
-        phone: 1,
-        location: 1,
-        availableLanguages: 1,
-        cvs: 1,
-        network: 1,
-        info: { $objectToArray: "$info" }
-      };
-
-      const data = await collection.findOne(queryId, { projection });
-      const info = data.info.find(x => x.k === lang);
-      data.info = info ? info.v : { candidateTitle: '', about: '', languages: [] };
-
-      const hasLanguage = data.availableLanguages.includes(lang);
-      if (!hasLanguage) {
-        data.info = { [lang]: 'Language not available' };
-      }
-      if (data) {
-        res.send(data);
-      }
-      else if (data === null || data.length === 0) {
-        res.status(404).send({ error: 404, message: 'No data found, check id' });
-      }
-    } catch (error) {
-      console.error(error.stack);
-      res.status(500).send({ error, message: 'Internal Server Error' });
+    switch (collectionName) {
+      case collections.Users:
+        handler.users(req, res, collectionName);
+        break;
+      case collections.WorkExperiences:
+        handler.work(req, res, collectionName);
+        break;
+      case collections.Education:
+        handler.education(req, res, collectionName);
+        break;
+      case collections.skills:
+        handler.skills(req, res, collectionName);
+        break;
+      default:
+        break;
     }
   });
 

@@ -17,7 +17,9 @@ app.use(express.json());
 app.use(apiKey);
 
 app.get('/', (req, res) => {
-  res.send({ hello: 'Welcome to the API, please make a request' });
+  res.send({
+    hello: 'Welcome to the API, please make a request'
+  });
 });
 
 
