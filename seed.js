@@ -62,7 +62,7 @@ const seedJobs = async () => {
   }
 };
 
-seedJobs();
+// seedJobs();
 
 
 const seedEducation = async () => {
@@ -97,7 +97,7 @@ const seedEducation = async () => {
   }
 };
 
-// seedEducation();
+seedEducation();
 
 
 const seedSkills = async () => {

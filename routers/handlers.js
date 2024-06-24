@@ -72,10 +72,10 @@ const handler = {
         try {
             await connectToMongo();
             const collection = db.collection(collectionName);
-            const queryId = collectionName === 'wWorkExperience' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
+            const queryId = collectionName === 'Users' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
             const data = await collection.findOne(queryId);
 
-            const transformedData = {
+            const modifiedData = {
                 _id: data._id,
                 userId: data.userId,
                 experiences: data.experiences.map(exp => ({
@@ -85,7 +85,7 @@ const handler = {
             };
 
             if (data) {
-                res.send(transformedData);
+                res.send(modifiedData);
             }
             else if (data === null || data.length === 0) {
                 res.status(404).send({ error: 404, message: 'No data found, check id' });
@@ -97,13 +97,15 @@ const handler = {
     },
     education: async (req, res, collectionName) => {
         const id = req.params.id;
+        const lang = req.params.lang;
         try {
             await connectToMongo();
             const collection = db.collection(collectionName);
-            const queryId = collectionName === 'Education' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
+            const queryId = collectionName === 'Users' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
             const data = await collection.findOne(queryId);
+            const modifiedData = data.education.map(i => { return { id: i._id, ...i[lang] }; });
             if (data) {
-                res.send(data);
+                res.send(modifiedData);
             }
             else if (data === null || data.length === 0) {
                 res.status(404).send({ error: 404, message: 'No data found, check id' });
