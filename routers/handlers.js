@@ -103,7 +103,7 @@ const handler = {
             const collection = db.collection(collectionName);
             const queryId = collectionName === 'Users' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
             const data = await collection.findOne(queryId);
-            const modifiedData = data.education.map(i => { return { id: i._id, ...i[lang] }; });
+            const modifiedData = data.education.map(i => { return { id: i._id, url: i.url, ...i[lang] }; });
             if (data) {
                 res.send(modifiedData);
             }
