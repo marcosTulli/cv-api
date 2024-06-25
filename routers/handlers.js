@@ -95,6 +95,7 @@ const handler = {
             res.status(500).send({ error, message: 'Internal Server Error' });
         }
     },
+
     education: async (req, res, collectionName) => {
         const id = req.params.id;
         const lang = req.params.lang;
@@ -115,13 +116,14 @@ const handler = {
             res.status(500).send({ error, message: 'Internal Server Error' });
         }
     },
+
     skills: async (req, res, collectionName) => {
         const id = req.params.id;
         try {
             await connectToMongo();
             const collection = db.collection(collectionName);
             const queryId = collectionName === 'Users' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
-            const data = await collection.findOne(queryId, { projection });
+            const data = await collection.findOne(queryId);
 
             if (data) {
                 res.send(data);
