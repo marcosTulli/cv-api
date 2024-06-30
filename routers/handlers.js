@@ -1,17 +1,27 @@
 
 const { MongoClient, ObjectId } = require('mongodb');
-const { MONGO_URL, DB_NAME } = process.env;
+const { MONGO_URL, DB_NAME, OBJECTS_DB } = process.env;
 require('dotenv').config();
 
 let client;
 let db;
 
-const connectToMongo = async () => {
+const connectToCVDB = async () => {
     if (!client) {
         client = new MongoClient(MONGO_URL);
         await client.connect();
         db = client.db(DB_NAME);
-        console.log('Connected to the MongoDB');
+        console.log('Connected to CV DB');
+    }
+
+};
+
+const connectToObjectsDB = async () => {
+    if (!client) {
+        client = new MongoClient(MONGO_URL);
+        await client.connect();
+        db = client.db(OBJECTS_DB);
+        console.log('Connected to OBJECTS DB');
     }
 };
 
@@ -19,7 +29,7 @@ const handler = {
     base: async (req, res, collectionName) => {
 
         try {
-            await connectToMongo();
+            await connectToCVDB();
             const collection = db.collection(collectionName);
             const data = await collection.find().toArray();
             res.status(200).send(data);
@@ -43,7 +53,7 @@ const handler = {
             info: { $objectToArray: "$info" }
         };
         try {
-            await connectToMongo();
+            await connectToCVDB();
             const collection = db.collection(collectionName);
             const queryId = collectionName === 'Users' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
             const data = await collection.findOne(queryId, { projection });
@@ -70,7 +80,7 @@ const handler = {
         const id = req.params.id;
         const lang = req.params.lang;
         try {
-            await connectToMongo();
+            await connectToCVDB();
             const collection = db.collection(collectionName);
             const queryId = collectionName === 'Users' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
             const data = await collection.findOne(queryId);
@@ -100,7 +110,7 @@ const handler = {
         const id = req.params.id;
         const lang = req.params.lang;
         try {
-            await connectToMongo();
+            await connectToCVDB();
             const collection = db.collection(collectionName);
             const queryId = collectionName === 'Users' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
             const data = await collection.findOne(queryId);
@@ -120,7 +130,7 @@ const handler = {
     skills: async (req, res, collectionName) => {
         const id = req.params.id;
         try {
-            await connectToMongo();
+            await connectToCVDB();
             const collection = db.collection(collectionName);
             const queryId = collectionName === 'Users' ? { _id: new ObjectId(id) } : { userId: new ObjectId(id) };
             const data = await collection.findOne(queryId);
@@ -130,6 +140,27 @@ const handler = {
             }
             else if (data === null || data.length === 0) {
                 res.status(404).send({ error: 404, message: 'No data found, check id' });
+            }
+        } catch (error) {
+            console.error(error.stack);
+            res.status(500).send({ error, message: 'Internal Server Error' });
+        }
+    },
+
+    icons: async (req, res, collectionName) => {
+        const iconName = req.params.name;
+        try {
+            await connectToObjectsDB();
+            const collection = db.collection(collectionName);
+            const data = await collection.findOne({ name: iconName });
+            const buffer = Buffer.from(data.file, 'base64');
+
+            if (data) {
+                res.contentType('image/png');
+                res.send(buffer);
+            }
+            else if (data === null || data.length === 0) {
+                res.status(404).send({ error: 404, message: 'No data found, check file name' });
             }
         } catch (error) {
             console.error(error.stack);

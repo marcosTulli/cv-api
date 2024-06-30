@@ -5,6 +5,7 @@ const cors = require('cors');
 const createRouter = require('../routers/router');
 const compression = require('compression');
 const routes = require('../routers/routes');
+const objectsRouter = require('../routers/objectRouter');
 const apiKey = require('../midleware/apiKey');
 
 const PORT = process.env.PORT || 3001;
@@ -26,6 +27,8 @@ app.get('/', (req, res) => {
 routes.forEach(route => {
   app.use(route.path, createRouter(route.collection));
 });
+
+app.use('/icons', objectsRouter('icons'));
 
 app.use((req, res, next) => {
   res.status(500).send({ message: 'Endpoint not found' });

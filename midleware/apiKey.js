@@ -10,7 +10,6 @@ const apiKeyMiddleware = async (req, res, next) => {
         return res.status(401).send({ message: 'API key is missing' });
     }
 
-    // const isApiKeyValid = await bcrypt.compare(validApiKey, incomingKey).finally((result) => { result; });
     const isApiKeyValid = validApiKey === incomingKey;
 
     if (isApiKeyValid) {

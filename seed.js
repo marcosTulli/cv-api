@@ -1,11 +1,12 @@
-const { MongoClient } = require('mongodb');
+const { MongoClient, ObjectId, Binary } = require('mongodb');
 require('dotenv').config();
+const fs = require('fs');
+const path = require('path');
 const usersLocal = require('./data/users');
 const jobsLocal = require('./data/jobs');
 const educationLocal = require('./data/education');
 const skillsLocal = require('./data/skills');
-const info = require('./data/info');
-const { MONGO_URL, DB_NAME } = process.env;
+const { MONGO_URL, DB_NAME, OBJECTS_DB } = process.env;
 
 
 const seedUsers = async () => {
@@ -97,7 +98,7 @@ const seedEducation = async () => {
   }
 };
 
-seedEducation();
+// seedEducation();
 
 
 const seedSkills = async () => {
@@ -138,3 +139,46 @@ const seedSkills = async () => {
 
 
 
+
+const seedIcon = async () => {
+  let client;
+  try {
+    client = new MongoClient(MONGO_URL);
+    await client.connect();
+    console.log('Connected to the mongo DB');
+    const db = client.db(OBJECTS_DB);
+    const iconsCollection = db.collection('icons');
+
+    const publicDir = path.join(__dirname, 'public');
+    const files = fs.readdirSync(publicDir, (err, files) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      else return files;
+
+    });
+    const fileName = files[34];
+    const filePath = path.join(__dirname, `public/${fileName}`);
+    const fileBuffer = fs.readFileSync(filePath);
+
+    const fileObject = {
+      _id: new ObjectId(),
+      name: fileName,
+      file: Binary.createFromBase64(fileBuffer.toString('base64'), 0)
+    };
+
+
+    await iconsCollection.drop();
+    await iconsCollection.insertOne(fileObject);
+
+  } catch (error) {
+    console.error(error.stack);
+  } finally {
+    if (client) {
+      await client.close();
+    }
+  }
+};
+
+seedIcon();

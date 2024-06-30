@@ -6,4 +6,5 @@ const routes = [
     { path: '/education', collection: 'Education' },
     { path: '/skills', collection: 'Skills' },
 ];
+
 module.exports = routes;

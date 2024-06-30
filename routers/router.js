@@ -21,6 +21,9 @@ const handlerSelector = (req, res, collectionName) => {
     case collections.Skills:
       handler.skills(req, res, collectionName);
       break;
+    case 'icons':
+      handler.icons(req, res, collectionName);
+      break;
     default:
       break;
   }
@@ -39,8 +42,12 @@ const createRouter = (collectionName) => {
 
   router.route('/:id').get(async (req, res) => {
     handlerSelector(req, res, collectionName);
+
   });
 
+  router.route('/:icon').get(async (req, res) => {
+    handlerSelector(req, res, collectionName);
+  });
 
   return router;
 };
