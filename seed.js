@@ -158,18 +158,18 @@ const seedIcon = async () => {
       else return files;
 
     });
-    const fileName = files[34];
+    const fileName = files[32];
     const filePath = path.join(__dirname, `public/${fileName}`);
     const fileBuffer = fs.readFileSync(filePath);
 
     const fileObject = {
       _id: new ObjectId(),
       name: fileName,
-      file: Binary.createFromBase64(fileBuffer.toString('base64'), 0)
+      file: fileBuffer
     };
 
 
-    await iconsCollection.drop();
+    // await iconsCollection.drop();
     await iconsCollection.insertOne(fileObject);
 
   } catch (error) {

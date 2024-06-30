@@ -153,9 +153,9 @@ const handler = {
             await connectToObjectsDB();
             const collection = db.collection(collectionName);
             const data = await collection.findOne({ name: iconName });
-            const buffer = Buffer.from(data.file, 'base64');
 
             if (data) {
+                const buffer = Buffer.from(data.file.buffer);
                 res.contentType('image/png');
                 res.send(buffer);
             }
