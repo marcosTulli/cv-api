@@ -137,9 +137,6 @@ const seedSkills = async () => {
 
 
 
-
-
-
 const seedIcon = async () => {
   let client;
   try {
