@@ -28,7 +28,7 @@ routes.forEach(route => {
   app.use(route.path, createRouter(route.collection));
 });
 
-app.use('/icons', objectsRouter('icons'));
+// app.use('/icons', objectsRouter('icons'));
 
 app.use((req, res, next) => {
   res.status(500).send({ message: 'Endpoint not found' });
