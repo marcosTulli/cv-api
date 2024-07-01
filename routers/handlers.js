@@ -153,6 +153,7 @@ const handler = {
             await connectToObjectsDB();
             const collection = db.collection(collectionName);
             console.log(`Connected to collection ${collectionName}`);
+            console.log('Searching:', iconName);
             const data = await collection.findOne({ name: iconName });
 
             if (data) {
@@ -162,6 +163,7 @@ const handler = {
                 console.log(`Served ${data.name}`);
             }
             else if (data === null || data.length === 0) {
+                console.log(data);
                 res.status(404).send({ error: 404, message: 'No data found, check file name' });
             }
         } catch (error) {
