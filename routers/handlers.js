@@ -158,6 +158,7 @@ const handler = {
                 const buffer = Buffer.from(data.file.buffer);
                 res.contentType('image/png');
                 res.send(buffer);
+                console.log(`Served ${data.name}`);
             }
             else if (data === null || data.length === 0) {
                 res.status(404).send({ error: 404, message: 'No data found, check file name' });
