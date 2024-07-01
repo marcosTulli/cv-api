@@ -1,5 +1,3 @@
-
-
 const routes = [
     { path: '/users', collection: 'Users' },
     { path: '/work-experience', collection: 'WorkExperiences' },

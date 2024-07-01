@@ -152,6 +152,7 @@ const handler = {
         try {
             await connectToObjectsDB();
             const collection = db.collection(collectionName);
+            console.log(`Connected to collection ${collectionName}`);
             const data = await collection.findOne({ name: iconName });
 
             if (data) {
