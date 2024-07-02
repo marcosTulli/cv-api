@@ -6,8 +6,28 @@ const usersLocal = require('./data/users');
 const jobsLocal = require('./data/jobs');
 const educationLocal = require('./data/education');
 const skillsLocal = require('./data/skills');
+const iconsLocal = require('./data/icons');
 const { MONGO_URL, DB_NAME, OBJECTS_DB } = process.env;
 
+const seedIcons = async () => {
+  let client;
+  try {
+    client = new MongoClient(MONGO_URL);
+    await client.connect();
+    console.log('Connected to the mongo DB');
+    const db = client.db(DB_NAME);
+    const usersCollection = db.collection('Icons');
+    await usersCollection.drop();
+    await usersCollection.insertMany(iconsLocal);
+  } catch (error) {
+    console.error(error.stack);
+  } finally {
+    if (client) {
+      await client.close();
+    }
+  }
+};
+// seedIcons();
 
 const seedUsers = async () => {
   let client;
@@ -133,9 +153,10 @@ const seedSkills = async () => {
   }
 };
 
-// seedSkills()
+// seedSkills();
 
 
+// I'll keep this for testing purposes, but I won't be seeding the db with object no more. 
 
 // const seedIcon = async () => {
 //   let client;
@@ -143,49 +164,32 @@ const seedSkills = async () => {
 //     client = new MongoClient(MONGO_URL);
 //     await client.connect();
 //     console.log('Connected to the mongo DB');
+
 //     const db = client.db(OBJECTS_DB);
 //     const iconsCollection = db.collection('icons');
 
 //     const iconsDir = path.join(__dirname, 'public/icons');
-//     const icons = fs.readdirSync(iconsDir, (err, dirs) => {
-//       if (err) {
-//         console.log(err);
-//         return;
-//       }
-//       else return dirs;
+//     const dirs = fs.readdirSync(iconsDir);
 
-//     });
 
-//     const iconsFiles = icons.flatMap((dir) => {
+//     const iconsFiles = dirs.flatMap((dir) => {
 //       const dirPath = path.join(iconsDir, dir);
-//       const icons = fs.readdirSync(dirPath, (err, files) => {
-//         if (err) {
-//           console.log(err);
-//           return;
-//         }
-//       });
-//       return { dir, icons };
+//       const files = fs.readdirSync(dirPath);
+//       return files.map(file => ({ dir, file }));
 //     });
-
 
 //     await iconsCollection.drop();
-//     const iconDocuments = iconsFiles.flatMap((file) => {
-//       const collectionName = file.dir;
-//       const documents = file.icons.map(fileName => {
-//         const filePath = path.join(__dirname, `public/icons/${file.dir}/${fileName}`);
-//         const fileBuffer = fs.readFileSync(filePath);
-//         const document = {
-//           _id: new ObjectId(),
-//           name: fileName,
-//           file: fileBuffer,
-//           type: collectionName
-//         };
-//         return document;
-//       });
 
-//       return documents;
+//     const iconDocuments = iconsFiles.map(({ dir, file }) => {
+//       const filePath = path.join(__dirname, `public/icons/${dir}/${file}`);
+//       const fileBuffer = fs.readFileSync(filePath);
+//       return {
+//         _id: new ObjectId(),
+//         name: file,
+//         file: fileBuffer,
+//         type: dir,
+//       };
 //     });
-
 
 
 //     await iconsCollection.insertMany(iconDocuments);
@@ -199,50 +203,4 @@ const seedSkills = async () => {
 //   }
 // };
 
-
-const seedIcon = async () => {
-  let client;
-  try {
-    client = new MongoClient(MONGO_URL);
-    await client.connect();
-    console.log('Connected to the mongo DB');
-
-    const db = client.db(OBJECTS_DB);
-    const iconsCollection = db.collection('icons');
-
-    const iconsDir = path.join(__dirname, 'public/icons');
-    const dirs = fs.readdirSync(iconsDir);
-
-
-    const iconsFiles = dirs.flatMap((dir) => {
-      const dirPath = path.join(iconsDir, dir);
-      const files = fs.readdirSync(dirPath);
-      return files.map(file => ({ dir, file }));
-    });
-
-    await iconsCollection.drop();
-
-    const iconDocuments = iconsFiles.map(({ dir, file }) => {
-      const filePath = path.join(__dirname, `public/icons/${dir}/${file}`);
-      const fileBuffer = fs.readFileSync(filePath);
-      return {
-        _id: new ObjectId(),
-        name: file,
-        file: fileBuffer,
-        type: dir,
-      };
-    });
-
-
-    await iconsCollection.insertMany(iconDocuments);
-
-  } catch (error) {
-    console.error(error.stack);
-  } finally {
-    if (client) {
-      await client.close();
-    }
-  }
-};
-
-seedIcon();
+// seedIcon();
