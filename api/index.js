@@ -2,13 +2,14 @@ const express = require('express');
 require('dotenv').config();
 const helmet = require('helmet');
 const cors = require('cors');
-const createRouter = require('../routers/router');
+const { routes } = require('../utils');
 const compression = require('compression');
-const routes = require('../routers/routes');
+const routers = require('../routers');
 const apiKey = require('../midleware/apiKey');
 
 const PORT = process.env.PORT || 3001;
 const app = express();
+const { dataRouter, iconsRouter } = routers;
 
 app.use(helmet());
 app.use(cors());
@@ -24,8 +25,11 @@ app.get('/', (req, res) => {
 
 
 routes.forEach(route => {
-  app.use(route.path, createRouter(route.collection));
+  app.use(route.path, dataRouter(route.collection));
 });
+
+app.use('/icons', iconsRouter('Icons'));
+
 
 app.use((req, res, next) => {
   res.status(500).send({ message: 'Endpoint not found' });

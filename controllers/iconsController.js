@@ -1,19 +1,14 @@
 const { clientConnect } = require('../utils');
-const { ObjectId } = require('mongodb');
 
 const iconsController = async (req, res, collectionName) => {
     const name = req.params.name;
-    console.log(req.params);
-    console.log(name);
-
     try {
         await clientConnect();
         const collection = db.collection(collectionName);
-        const data = await collection.findOne({ name: name });
-        // const data = await collection.find().toArray();
+        const data = await collection.findOne({ name });
 
         if (data) {
-            res.send(data);
+            res.send(data.key);
         }
         else if (data === null || data.length === 0) {
             res.status(404).send({ error: 404, message: 'No data found, check id' });

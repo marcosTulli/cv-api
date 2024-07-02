@@ -1,6 +1,10 @@
 const { clientConnect } = require('../utils');
 
 const baseController = async (req, res, collectionName) => {
+    const base = req.baseUrl;
+    if (base.includes('icons')) {
+        res.status(404).send({ error: 'Missing file name' });
+    }
     try {
         await clientConnect();
         const collection = db.collection(collectionName);

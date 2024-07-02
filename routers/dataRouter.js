@@ -1,6 +1,6 @@
 const express = require('express');
 require('dotenv').config();
-const routes = require('./routes');
+const { routes } = require('../utils');
 const controllers = require('../controllers');
 
 const collections = routes.reduce((acc, curr) => ({
@@ -21,15 +21,15 @@ const controllerSelector = (req, res, collectionName) => {
     case collections.Skills:
       controllers.skillsController(req, res, collectionName);
       break;
-    case collections.Icons:
-      controllers.iconsController(req, res, collectionName);
-      break;
+    // case collections.Icons:
+    //   controllers.iconsController(req, res, collectionName);
+    //   break;
     default:
       break;
   }
 };
 
-const createRouter = (collectionName) => {
+const dataRouter = (collectionName) => {
   const router = express.Router();
 
   router.route('/').get(async (req, res) => {
@@ -45,11 +45,11 @@ const createRouter = (collectionName) => {
 
   });
 
-  router.route('/i/:name').get(async (req, res) => {
-    controllerSelector(req, res, collectionName);
-  });
+  // router.route('/icons/:name').get(async (req, res) => {
+  //   controllers.iconsController(req, res, collectionName);
+  // });
 
   return router;
 };
 
-module.exports = createRouter;
+module.exports = dataRouter;
