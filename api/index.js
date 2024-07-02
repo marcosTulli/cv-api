@@ -30,7 +30,6 @@ routes.forEach(route => {
 
 app.use('/icons', iconsRouter('Icons'));
 
-
 app.use((req, res, next) => {
   res.status(500).send({ message: 'Endpoint not found' });
 });

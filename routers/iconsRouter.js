@@ -9,7 +9,6 @@ const dataRouter = (collectionName) => {
         controllers.baseController(req, res, collectionName);
     });
 
-
     router.route('/:name').get(async (req, res) => {
         controllers.iconsController(req, res, collectionName);
 

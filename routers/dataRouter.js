@@ -21,9 +21,6 @@ const controllerSelector = (req, res, collectionName) => {
     case collections.Skills:
       controllers.skillsController(req, res, collectionName);
       break;
-    // case collections.Icons:
-    //   controllers.iconsController(req, res, collectionName);
-    //   break;
     default:
       break;
   }
@@ -44,10 +41,6 @@ const dataRouter = (collectionName) => {
     controllerSelector(req, res, collectionName);
 
   });
-
-  // router.route('/icons/:name').get(async (req, res) => {
-  //   controllers.iconsController(req, res, collectionName);
-  // });
 
   return router;
 };
